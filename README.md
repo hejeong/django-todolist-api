@@ -5,11 +5,13 @@ A sample todo list built using Django/Django REST Framework API and developed in
 Create a new python virtual environment <br/>
 - run `python3 -m venv venv` <br/>
 
+Switch into the virtual environment <br/>
+- run `source venv/bin/activate`
+
 Install the dependencies from 'requirements.txt'<br/>
 - In the root directory, run `pip install -r requirements.txt` <br/>
 
 Then you're all set!
-
 # Running the server
 Make sure all migrations are migrated <br/>
 - run `python manage.py makemigrations`
