@@ -11,7 +11,7 @@ router = DefaultRouter()
 router.register(r'todos', TodoViewSet)
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('', include(router.urls)),
     path('token/', jwt_views.TokenObtainPairView.as_view(), name='token-obtain-pair'),
     path('token/refresh', jwt_views.TokenRefreshView.as_view(), name='token-refresh'),
 ]
