@@ -66,6 +66,22 @@ def test_todo_list(db, client, create_todo, auto_login_user):
     assert response.json()[0]['title'] == todo.title
 
 
+def test_todo_list_unauthorized(db, client, create_todo):
+    """
+    Test that an unauthorized can't access the todo list when GET request is made to '/api/todos'
+    """
+    
+    # User NOT logged in
+    # create a Todo object in db
+    todo = create_todo(title="Learn how to use pytest", memo="Use the book 'Python Testing with Pytest'")
+    # get the url to for getting the todo list
+    url = reverse('todo-list')
+    # returns the response object from endpoint (no access token provided)
+    response = client.get(url)
+    
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
 def test_todo_create(db, client):
     """
     Test that a new object is successfully created when POST request is made to '/api/todos' successfully
