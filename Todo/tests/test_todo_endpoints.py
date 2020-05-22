@@ -3,6 +3,7 @@ import pytest
 from django.urls import reverse
 
 from Todo.models import Todo
+from Todo.serializers import TodoSerializer
 
 from rest_framework import status
 
@@ -59,8 +60,6 @@ def test_todo_create(db, client):
                             
     assert response.status_code == status.HTTP_201_CREATED
     assert Todo.objects.count() == 1
-    assert Todo.objects.all()[0]['title'] == title
-    assert Todo.objects.all()[0]['memo'] == memo
 
 
 def test_todo_detail(db, client, create_todo):
@@ -75,7 +74,7 @@ def test_todo_detail(db, client, create_todo):
     response = client.get(url)
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json()[0]['id'] == todo.pk
+    assert response.json()['id'] == todo.pk
 
 
 def test_todo_update(db, client, create_todo):
@@ -95,12 +94,13 @@ def test_todo_update(db, client, create_todo):
                         {
                             'title':new_title,
                             'memo':new_memo,
-                        })
-    assert response.status_code == status.HTTP_202_ACCEPTED
+                        },
+                        content_type="application/json")
+    assert response.status_code == status.HTTP_200_OK
 
-    updated_todo = Todo.objects.get(pk=todo.pk)
-    assert updated_todo.title == new_title
-    assert updated_todo.memo == new_memo
+    updated_todo = TodoSerializer(Todo.objects.get(pk=todo.pk)).data
+    assert updated_todo['title'] == new_title
+    assert updated_todo['memo'] == new_memo
 
 
 def test_todo_delete(db, client, create_todo):
