@@ -1,6 +1,7 @@
 import pytest
 
 from django.urls import reverse
+from django.contrib.auth.models import User
 
 from Todo.models import Todo
 from Todo.serializers import TodoSerializer
@@ -17,6 +18,32 @@ def create_todo(db):
     def make_todo(**kwargs):
         return Todo.objects.create(**kwargs)
     return make_todo
+
+
+@pytest.fixture
+def auto_login_user(db, client):
+    """
+    Fixture to automatically log in a user using JWT authentication
+    """
+
+    def make_auto_login():
+        # set password
+        password = 'johnnyappleseed'
+        # create user
+        user = User.objects.create_user('johnsmith', 'johnsmith@gmail.com', password)
+        # login using JWT authentication
+        response = client.post(
+                    reverse('token-obtain-pair'),
+                    {
+                        'username':user.username,
+                        'password':password
+                    }
+                        
+                )
+        assert response.status_code == status.HTTP_200_OK
+        # returns the access token and refresh tokens
+        return response.json()['access'], response.json()['refresh']
+    return make_auto_login
 
 
 def test_todo_list(db, client, create_todo):
