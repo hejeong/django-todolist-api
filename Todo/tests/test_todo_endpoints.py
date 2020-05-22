@@ -59,8 +59,12 @@ def test_todo_list(db, client, create_todo, auto_login_user):
     todo = create_todo(title="Learn how to use pytest", memo="Use the book 'Python Testing with Pytest'")
     # get the url to for getting the todo list
     url = reverse('todo-list')
+    # add access token to request headers
+    headers = {
+        'HTTP_AUTHORIZATION': 'Bearer ' + access_token,
+    }
     # returns the response object from endpoint
-    response = client.get(url, headers={"Authorization":"Bearer " + access_token})
+    response = client.get(url, **headers)
     
     assert response.status_code == status.HTTP_200_OK
     assert response.json()[0]['title'] == todo.title
@@ -82,7 +86,7 @@ def test_todo_list_unauthorized(db, client, create_todo):
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
-def test_todo_create(db, client):
+def test_todo_create(db, client, auto_login_user):
     """
     Test that a new object is successfully created when POST request is made to '/api/todos' successfully
     """
@@ -96,6 +100,10 @@ def test_todo_create(db, client):
     memo = "Use the book 'Python Testing with Pytest'"
     # get the url to for creating the todo object
     url = reverse('todo-list')
+    # add access token to request headers
+    headers = {
+        'HTTP_AUTHORIZATION': 'Bearer ' + access_token,
+    }
     # returns the response object from endpoint
     response = client.post(
                             url, 
@@ -103,14 +111,14 @@ def test_todo_create(db, client):
                                 'title':title, 
                                 "memo":memo,
                             },
-                            headers={"Authorization":"Bearer " + access_token}
+                            **headers
                         )
                             
     assert response.status_code == status.HTTP_201_CREATED
     assert Todo.objects.count() == 1
 
 
-def test_todo_detail(db, client, create_todo):
+def test_todo_detail(db, client, create_todo, auto_login_user):
     """
     Test that a get request can be made to '/api/todos/<id>' to obtain the detail page of a todo object successfully
     """
@@ -121,13 +129,17 @@ def test_todo_detail(db, client, create_todo):
     todo = create_todo(title='Learn how to use pytest', memo="Use the book 'Python Testing with Pytest'")
     # get url for retrieving detail page for specific blog
     url = reverse('todo-detail', args=(todo.pk,))
-    response = client.get(url, headers={"Authorization":"Bearer " + access_token})
+    # add access token to request headers
+    headers = {
+        'HTTP_AUTHORIZATION': 'Bearer ' + access_token,
+    }
+    response = client.get(url, **headers)
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json()['id'] == todo.pk
 
 
-def test_todo_update(db, client, create_todo):
+def test_todo_update(db, client, create_todo, auto_login_user):
     """
     Test that a PUT request can be made to '/api/todos/<id>' to update a todo object successfully
     """
@@ -141,13 +153,17 @@ def test_todo_update(db, client, create_todo):
     new_memo = "Use the book 'Python Testing with Pytest and other resources'"
     # get url for updating the todo object
     url = reverse('todo-detail', args=(todo.pk,))
+    # add access token to request headers
+    headers = {
+        'HTTP_AUTHORIZATION': 'Bearer ' + access_token,
+    }
     response = client.put(
                         url, 
                         {
                             'title':new_title,
                             'memo':new_memo,
                         },
-                        headers={"Authorization":"Bearer " + access_token},
+                        **headers,
                         content_type="application/json")
     assert response.status_code == status.HTTP_200_OK
 
@@ -156,7 +172,7 @@ def test_todo_update(db, client, create_todo):
     assert updated_todo['memo'] == new_memo
 
 
-def test_todo_delete(db, client, create_todo):
+def test_todo_delete(db, client, create_todo, auto_login_user):
     """
     Test that a DELETE request can be made to '/api/todos/<id>' to destroy a todo object successfully
     """
@@ -170,8 +186,12 @@ def test_todo_delete(db, client, create_todo):
 
     # get url for updating the todo object
     url = reverse('todo-detail', args=(todo.pk,))
+    # add access token to request headers
+    headers = {
+        'HTTP_AUTHORIZATION': 'Bearer ' + access_token,
+    }
     # make delete request to '/api/todos/<id>'
-    response = client.delete(url, headers={"Authorization":"Bearer " + access_token})
+    response = client.delete(url, **headers)
     
     assert response.status_code == status.HTTP_204_NO_CONTENT
     assert Todo.objects.count() == 0
