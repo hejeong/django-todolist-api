@@ -1,6 +1,7 @@
 asgiref==3.2.7
 attrs==19.3.0
 Django==2.2.10
+djangorestframework==3.11.0
 importlib-metadata==1.6.0
 more-itertools==8.3.0
 packaging==20.4
