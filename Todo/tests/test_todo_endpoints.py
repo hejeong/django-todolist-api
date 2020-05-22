@@ -9,6 +9,7 @@ from Todo.serializers import TodoSerializer
 from rest_framework import status
 
 
+# --- Fixtures ---
 @pytest.fixture
 def create_todo(db):
     """
@@ -46,6 +47,7 @@ def auto_login_user(db, client):
     return make_auto_login
 
 
+# --- Protected Actions (Authenticated) ---
 def test_todo_list(db, client, create_todo, auto_login_user):
     """
     Test that a list of todos are returned when GET request is made to '/api/todos'
@@ -68,22 +70,6 @@ def test_todo_list(db, client, create_todo, auto_login_user):
     
     assert response.status_code == status.HTTP_200_OK
     assert response.json()[0]['title'] == todo.title
-
-
-def test_todo_list_unauthorized(db, client, create_todo):
-    """
-    Test that an unauthorized can't access the todo list when GET request is made to '/api/todos'
-    """
-    
-    # User NOT logged in
-    # create a Todo object in db
-    todo = create_todo(title="Learn how to use pytest", memo="Use the book 'Python Testing with Pytest'")
-    # get the url to for getting the todo list
-    url = reverse('todo-list')
-    # returns the response object from endpoint (no access token provided)
-    response = client.get(url)
-    
-    assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 def test_todo_create(db, client, auto_login_user):
@@ -195,3 +181,94 @@ def test_todo_delete(db, client, create_todo, auto_login_user):
     
     assert response.status_code == status.HTTP_204_NO_CONTENT
     assert Todo.objects.count() == 0
+
+
+# --- Protected Actions (Not Authenticated) ---
+def test_todo_list_unauth(db, client, create_todo):
+    """
+    Test that unauthorized users are rejected when GET request is made to '/api/todos'
+    """
+    
+    # create a Todo object in db
+    todo = create_todo(title="Learn how to use pytest", memo="Use the book 'Python Testing with Pytest'")
+    # get the url to for getting the todo list
+    url = reverse('todo-list')
+    # returns the response object from endpoint
+    response = client.get(url)
+    
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+def test_todo_create_unauth(db, client):
+    """
+    Test that unauthorized users are rejected when POST request is made to '/api/todos'
+    """
+    
+    # define model values
+    title = "Learn how to use pytest"
+    memo = "Use the book 'Python Testing with Pytest'"
+    # get the url to for creating the todo object
+    url = reverse('todo-list')
+    # returns the response object from endpoint
+    response = client.post(
+                            url, 
+                            {
+                                'title':title, 
+                                "memo":memo,
+                            })
+                
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+def test_todo_detail_unauth(db, client, create_todo):
+    """
+    Test that an unauthorized user is rejected when a get request is made to '/api/todos/<id>' to obtain the detail page of a todo object
+    """
+
+    # create todo object in db
+    todo = create_todo(title='Learn how to use pytest', memo="Use the book 'Python Testing with Pytest'")
+    # get url for retrieving detail page for specific blog
+    url = reverse('todo-detail', args=(todo.pk,))
+    response = client.get(url)
+
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+def test_todo_update_unauth(db, client, create_todo):
+    """
+    Test that an authorized user is rejected when a PUT request is made to '/api/todos/<id>' to update a todo object
+    """
+
+    # create todo object in db
+    todo = create_todo(title='Learn how to use pytest', memo="Use the book 'Python Testing with Pytest'")
+    # set values to be updated
+    new_title = 'Learn how to use pytest with DjangoRestFramework'
+    new_memo = "Use the book 'Python Testing with Pytest and other resources'"
+    # get url for updating the todo object
+    url = reverse('todo-detail', args=(todo.pk,))
+    response = client.put(
+                        url, 
+                        {
+                            'title':new_title,
+                            'memo':new_memo,
+                        },
+                        content_type="application/json")
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+def test_todo_delete_unauth(db, client, create_todo):
+    """
+    Test that an unauthorized user is rejected when a DELETE request is made to '/api/todos/<id>' to destroy a todo object
+    """
+
+    # create todo object in db
+    todo = create_todo(title='Learn how to use pytest', memo="Use the book 'Python Testing with Pytest'")
+    # assert there are exactly 1 Todo objects
+    assert Todo.objects.count() == 1
+
+    # get url for updating the todo object
+    url = reverse('todo-detail', args=(todo.pk,))
+    # make delete request to '/api/todos/<id>'
+    response = client.delete(url)
+    
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
