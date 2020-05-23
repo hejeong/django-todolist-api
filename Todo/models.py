@@ -5,6 +5,7 @@ class Todo(models.Model):
     memo = models.TextField(blank=True)
     created = models.DateTimeField(auto_now_add=True)
     date_completed = models.DateTimeField(null=True, blank=True)
+    owner = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     # add user relation
 
     def __str__(self):
