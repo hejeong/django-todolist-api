@@ -43,7 +43,7 @@ def auto_login_user(db, client):
                 )
         assert response.status_code == status.HTTP_200_OK
         # returns the access token and refresh tokens
-        return response.json()['access'], response.json()['refresh']
+        return user.id, response.json()['access'], response.json()['refresh']
     return make_auto_login
 
 
@@ -56,7 +56,7 @@ def test_todo_list(db, client, create_todo, auto_login_user):
     """
     
     # login user
-    access_token, refresh_token = auto_login_user()
+    user_id, access_token, refresh_token = auto_login_user()
     # create a Todo object in db
     todo = create_todo(title="Learn how to use pytest", memo="Use the book 'Python Testing with Pytest'")
     # get the url to for getting the todo list
@@ -72,13 +72,40 @@ def test_todo_list(db, client, create_todo, auto_login_user):
     assert response.json()[0]['title'] == todo.title
 
 
+def test_todo_list_owner(db, client, create_todo, auto_login_user):
+    """
+    Test that the list of todos returned when GET request is made to '/api/todos' contains only todos owned by current user
+    """
+    
+    # login user
+    user_id, access_token, refresh_token = auto_login_user()
+    # create a Todo object in db made by current user
+    todo = create_todo(title="Learn how to use pytest", memo="Use the book 'Python Testing with Pytest'", owner=user_id)
+    # create second user
+    user_id2, access_token2, refresh_token2 = auto_login_user()
+    # create second Todo object made by user #2
+    todo2 = create_todo(title="Learn how to use Ant.design", owner=user_id2)
+    # get the url to for getting the todo list
+    url = reverse('todo-list')
+    # add access token to request headers
+    headers = {
+        'HTTP_AUTHORIZATION': 'Bearer ' + access_token,
+    }
+    # returns the response object from endpoint
+    response = client.get(url, **headers)
+    
+    assert response.status_code == status.HTTP_200_OK
+    assert len(response.json()) == 1
+    assert response.json()[0]['id'] == todo.id
+
+
 def test_todo_create(db, client, auto_login_user):
     """
     Test that a new object is successfully created when POST request is made to '/api/todos' successfully
     """
     
     # login user
-    access_token, refresh_token = auto_login_user()
+    user_id, access_token, refresh_token = auto_login_user()
     # should begin with zero Todo objects
     assert Todo.objects.count() == 0
     # define model values
@@ -110,7 +137,7 @@ def test_todo_detail(db, client, create_todo, auto_login_user):
     """
 
     # login user
-    access_token, refresh_token = auto_login_user()
+    user_id, access_token, refresh_token = auto_login_user()
     # create todo object in db
     todo = create_todo(title='Learn how to use pytest', memo="Use the book 'Python Testing with Pytest'")
     # get url for retrieving detail page for specific blog
@@ -131,7 +158,7 @@ def test_todo_update(db, client, create_todo, auto_login_user):
     """
 
     # login user
-    access_token, refresh_token = auto_login_user()
+    user_id, access_token, refresh_token = auto_login_user()
     # create todo object in db
     todo = create_todo(title='Learn how to use pytest', memo="Use the book 'Python Testing with Pytest'")
     # set values to be updated
@@ -164,7 +191,7 @@ def test_todo_delete(db, client, create_todo, auto_login_user):
     """
 
     # login user
-    access_token, refresh_token = auto_login_user()
+    user_id, access_token, refresh_token = auto_login_user()
     # create todo object in db
     todo = create_todo(title='Learn how to use pytest', memo="Use the book 'Python Testing with Pytest'")
     # assert there are exactly 1 Todo objects

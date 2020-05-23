@@ -24,4 +24,4 @@ def test_todo_create_without_memo():
     Todo.objects.create(
         title="Learn how to use pytest"
     )
-    assert Todo.objects.count() == 1
+    assert Todo.objects.count() == 1    
