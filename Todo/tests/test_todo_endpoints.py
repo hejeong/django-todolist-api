@@ -58,7 +58,7 @@ def test_todo_list(db, client, create_todo, auto_login_user):
     # login user
     user_id, access_token, refresh_token = auto_login_user()
     # create a Todo object in db
-    todo = create_todo(title="Learn how to use pytest", memo="Use the book 'Python Testing with Pytest'")
+    todo = create_todo(title="Learn how to use pytest", memo="Use the book 'Python Testing with Pytest'", owner=user_id)
     # get the url to for getting the todo list
     url = reverse('todo-list')
     # add access token to request headers
@@ -139,7 +139,7 @@ def test_todo_detail(db, client, create_todo, auto_login_user):
     # login user
     user_id, access_token, refresh_token = auto_login_user()
     # create todo object in db
-    todo = create_todo(title='Learn how to use pytest', memo="Use the book 'Python Testing with Pytest'")
+    todo = create_todo(title='Learn how to use pytest', memo="Use the book 'Python Testing with Pytest'", owner=user_id)
     # get url for retrieving detail page for specific blog
     url = reverse('todo-detail', args=(todo.pk,))
     # add access token to request headers
@@ -160,7 +160,7 @@ def test_todo_update(db, client, create_todo, auto_login_user):
     # login user
     user_id, access_token, refresh_token = auto_login_user()
     # create todo object in db
-    todo = create_todo(title='Learn how to use pytest', memo="Use the book 'Python Testing with Pytest'")
+    todo = create_todo(title='Learn how to use pytest', memo="Use the book 'Python Testing with Pytest'", owner=user_id)
     # set values to be updated
     new_title = 'Learn how to use pytest with DjangoRestFramework'
     new_memo = "Use the book 'Python Testing with Pytest and other resources'"
@@ -185,6 +185,37 @@ def test_todo_update(db, client, create_todo, auto_login_user):
     assert updated_todo['memo'] == new_memo
 
 
+def test_todo_update_owner(db, client, create_todo, auto_login_user):
+    """
+    Test that a PUT request made to '/api/todos/<id>' is rejected if it is not the owner
+    """
+
+    # login user
+    user_id, access_token, refresh_token = auto_login_user()
+    # create todo object in db
+    todo = create_todo(title='Learn how to use pytest', memo="Use the book 'Python Testing with Pytest'", owner=user_id)
+    # login second user
+    user_id2, access_token2, refresh_token2 = auto_login_user()
+    # set values to be updated
+    new_title = 'Learn how to use pytest with DjangoRestFramework'
+    new_memo = "Use the book 'Python Testing with Pytest and other resources'"
+    # get url for updating the todo object
+    url = reverse('todo-detail', args=(todo.pk,))
+    # attempt to make update request using the token of second user (who isn't the owner)
+    headers = {
+        'HTTP_AUTHORIZATION': 'Bearer ' + access_token2,
+    }
+    response = client.put(
+                        url, 
+                        {
+                            'title':new_title,
+                            'memo':new_memo,
+                        },
+                        **headers,
+                        content_type="application/json")
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
 def test_todo_delete(db, client, create_todo, auto_login_user):
     """
     Test that a DELETE request can be made to '/api/todos/<id>' to destroy a todo object successfully
@@ -193,7 +224,7 @@ def test_todo_delete(db, client, create_todo, auto_login_user):
     # login user
     user_id, access_token, refresh_token = auto_login_user()
     # create todo object in db
-    todo = create_todo(title='Learn how to use pytest', memo="Use the book 'Python Testing with Pytest'")
+    todo = create_todo(title='Learn how to use pytest', memo="Use the book 'Python Testing with Pytest'", owner=user_id)
     # assert there are exactly 1 Todo objects
     assert Todo.objects.count() == 1
 
@@ -216,8 +247,10 @@ def test_todo_list_unauth(db, client, create_todo):
     Test that unauthorized users are rejected when GET request is made to '/api/todos'
     """
     
+    # login user
+    user_id, access_token, refresh_token = auto_login_user()
     # create a Todo object in db
-    todo = create_todo(title="Learn how to use pytest", memo="Use the book 'Python Testing with Pytest'")
+    todo = create_todo(title="Learn how to use pytest", memo="Use the book 'Python Testing with Pytest'", owner=user_id)
     # get the url to for getting the todo list
     url = reverse('todo-list')
     # returns the response object from endpoint
@@ -252,8 +285,10 @@ def test_todo_detail_unauth(db, client, create_todo):
     Test that an unauthorized user is rejected when a get request is made to '/api/todos/<id>' to obtain the detail page of a todo object
     """
 
+    # login user
+    user_id, access_token, refresh_token = auto_login_user()
     # create todo object in db
-    todo = create_todo(title='Learn how to use pytest', memo="Use the book 'Python Testing with Pytest'")
+    todo = create_todo(title='Learn how to use pytest', memo="Use the book 'Python Testing with Pytest'", owner=user_id)
     # get url for retrieving detail page for specific blog
     url = reverse('todo-detail', args=(todo.pk,))
     response = client.get(url)
@@ -266,8 +301,10 @@ def test_todo_update_unauth(db, client, create_todo):
     Test that an authorized user is rejected when a PUT request is made to '/api/todos/<id>' to update a todo object
     """
 
+    # login user
+    user_id, access_token, refresh_token = auto_login_user()
     # create todo object in db
-    todo = create_todo(title='Learn how to use pytest', memo="Use the book 'Python Testing with Pytest'")
+    todo = create_todo(title='Learn how to use pytest', memo="Use the book 'Python Testing with Pytest'", owner=user_id)
     # set values to be updated
     new_title = 'Learn how to use pytest with DjangoRestFramework'
     new_memo = "Use the book 'Python Testing with Pytest and other resources'"
@@ -288,8 +325,10 @@ def test_todo_delete_unauth(db, client, create_todo):
     Test that an unauthorized user is rejected when a DELETE request is made to '/api/todos/<id>' to destroy a todo object
     """
 
+    # login user
+    user_id, access_token, refresh_token = auto_login_user()
     # create todo object in db
-    todo = create_todo(title='Learn how to use pytest', memo="Use the book 'Python Testing with Pytest'")
+    todo = create_todo(title='Learn how to use pytest', memo="Use the book 'Python Testing with Pytest'", owner=user_id)
     # assert there are exactly 1 Todo objects
     assert Todo.objects.count() == 1
 
