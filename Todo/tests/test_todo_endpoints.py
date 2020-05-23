@@ -72,33 +72,6 @@ def test_todo_list(db, client, create_todo, auto_login_user):
     assert response.json()[0]['title'] == todo.title
 
 
-def test_todo_list_owner(db, client, create_todo, auto_login_user):
-    """
-    Test that the list of todos returned when GET request is made to '/api/todos' contains only todos owned by current user
-    """
-    
-    # login user
-    user, access_token, refresh_token = auto_login_user(username='johnsmith', email='johnsmith@gmail.com')
-    # create a Todo object in db made by current user
-    todo = create_todo(title="Learn how to use pytest", memo="Use the book 'Python Testing with Pytest'", owner=user)
-    # create second user
-    user2, access_token2, refresh_token2 = auto_login_user(username='johndoe', email='johndoe@gmail.com')
-    # create second Todo object made by user #2
-    todo2 = create_todo(title="Learn how to use Ant.design", owner=user2)
-    # get the url to for getting the todo list
-    url = reverse('todo-list')
-    # add access token to request headers
-    headers = {
-        'HTTP_AUTHORIZATION': 'Bearer ' + access_token,
-    }
-    # returns the response object from endpoint
-    response = client.get(url, **headers)
-    
-    assert response.status_code == status.HTTP_200_OK
-    assert len(response.json()) == 1
-    assert response.json()[0]['id'] == todo.id
-
-
 def test_todo_create(db, client, auto_login_user):
     """
     Test that a new object is successfully created when POST request is made to '/api/todos' successfully
@@ -183,37 +156,6 @@ def test_todo_update(db, client, create_todo, auto_login_user):
     updated_todo = TodoSerializer(Todo.objects.get(pk=todo.pk)).data
     assert updated_todo['title'] == new_title
     assert updated_todo['memo'] == new_memo
-
-
-def test_todo_update_owner(db, client, create_todo, auto_login_user):
-    """
-    Test that a PUT request made to '/api/todos/<id>' is rejected if it is not the owner
-    """
-
-    # login user
-    user, access_token, refresh_token = auto_login_user(username='johnsmith', email='johnsmith@gmail.com')
-    # create todo object in db
-    todo = create_todo(title='Learn how to use pytest', memo="Use the book 'Python Testing with Pytest'", owner=user)
-    # login second user
-    user2, access_token2, refresh_token2 = auto_login_user(username='johndoe', email='johndoe@gmail.com')
-    # set values to be updated
-    new_title = 'Learn how to use pytest with DjangoRestFramework'
-    new_memo = "Use the book 'Python Testing with Pytest and other resources'"
-    # get url for updating the todo object
-    url = reverse('todo-detail', args=(todo.pk,))
-    # attempt to make update request using the token of second user (who isn't the owner)
-    headers = {
-        'HTTP_AUTHORIZATION': 'Bearer ' + access_token2,
-    }
-    response = client.put(
-                        url, 
-                        {
-                            'title':new_title,
-                            'memo':new_memo,
-                        },
-                        **headers,
-                        content_type="application/json")
-    assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
 def test_todo_delete(db, client, create_todo, auto_login_user):
@@ -338,3 +280,62 @@ def test_todo_delete_unauth(db, client, create_todo, auto_login_user):
     response = client.delete(url)
     
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+# --- Owner Checks ---
+def test_todo_list_owner(db, client, create_todo, auto_login_user):
+    """
+    Test that the list of todos returned when GET request is made to '/api/todos' contains only todos owned by current user
+    """
+    
+    # login user
+    user, access_token, refresh_token = auto_login_user(username='johnsmith', email='johnsmith@gmail.com')
+    # create a Todo object in db made by current user
+    todo = create_todo(title="Learn how to use pytest", memo="Use the book 'Python Testing with Pytest'", owner=user)
+    # create second user
+    user2, access_token2, refresh_token2 = auto_login_user(username='johndoe', email='johndoe@gmail.com')
+    # create second Todo object made by user #2
+    todo2 = create_todo(title="Learn how to use Ant.design", owner=user2)
+    # get the url to for getting the todo list
+    url = reverse('todo-list')
+    # add access token to request headers
+    headers = {
+        'HTTP_AUTHORIZATION': 'Bearer ' + access_token,
+    }
+    # returns the response object from endpoint
+    response = client.get(url, **headers)
+    
+    assert response.status_code == status.HTTP_200_OK
+    assert len(response.json()) == 1
+    assert response.json()[0]['id'] == todo.id
+
+
+def test_todo_update_owner(db, client, create_todo, auto_login_user):
+    """
+    Test that a PUT request made to '/api/todos/<id>' is rejected if it is not the owner
+    """
+
+    # login user
+    user, access_token, refresh_token = auto_login_user(username='johnsmith', email='johnsmith@gmail.com')
+    # create todo object in db
+    todo = create_todo(title='Learn how to use pytest', memo="Use the book 'Python Testing with Pytest'", owner=user)
+    # login second user
+    user2, access_token2, refresh_token2 = auto_login_user(username='johndoe', email='johndoe@gmail.com')
+    # set values to be updated
+    new_title = 'Learn how to use pytest with DjangoRestFramework'
+    new_memo = "Use the book 'Python Testing with Pytest and other resources'"
+    # get url for updating the todo object
+    url = reverse('todo-detail', args=(todo.pk,))
+    # attempt to make update request using the token of second user (who isn't the owner)
+    headers = {
+        'HTTP_AUTHORIZATION': 'Bearer ' + access_token2,
+    }
+    response = client.put(
+                        url, 
+                        {
+                            'title':new_title,
+                            'memo':new_memo,
+                        },
+                        **headers,
+                        content_type="application/json")
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
