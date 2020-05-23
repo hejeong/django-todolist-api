@@ -242,7 +242,7 @@ def test_todo_delete(db, client, create_todo, auto_login_user):
 
 
 # --- Protected Actions (Not Authenticated) ---
-def test_todo_list_unauth(db, client, create_todo):
+def test_todo_list_unauth(db, client, create_todo, auto_login_user):
     """
     Test that unauthorized users are rejected when GET request is made to '/api/todos'
     """
@@ -259,7 +259,7 @@ def test_todo_list_unauth(db, client, create_todo):
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
-def test_todo_create_unauth(db, client):
+def test_todo_create_unauth(db, client, auto_login_user):
     """
     Test that unauthorized users are rejected when POST request is made to '/api/todos'
     """
@@ -280,7 +280,7 @@ def test_todo_create_unauth(db, client):
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
-def test_todo_detail_unauth(db, client, create_todo):
+def test_todo_detail_unauth(db, client, create_todo, auto_login_user):
     """
     Test that an unauthorized user is rejected when a get request is made to '/api/todos/<id>' to obtain the detail page of a todo object
     """
@@ -296,7 +296,7 @@ def test_todo_detail_unauth(db, client, create_todo):
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
-def test_todo_update_unauth(db, client, create_todo):
+def test_todo_update_unauth(db, client, create_todo, auto_login_user):
     """
     Test that an authorized user is rejected when a PUT request is made to '/api/todos/<id>' to update a todo object
     """
@@ -320,7 +320,7 @@ def test_todo_update_unauth(db, client, create_todo):
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
-def test_todo_delete_unauth(db, client, create_todo):
+def test_todo_delete_unauth(db, client, create_todo, auto_login_user):
     """
     Test that an unauthorized user is rejected when a DELETE request is made to '/api/todos/<id>' to destroy a todo object
     """
