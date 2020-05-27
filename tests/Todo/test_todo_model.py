@@ -1,7 +1,7 @@
 import pytest
 
 from Todo.models import Todo
-from Todo.tests.test_todo_endpoints import auto_login_user
+from tests.Todo.test_todo_endpoints import auto_login_user
 
 @pytest.mark.django_db
 def test_todo_create(auto_login_user):
