@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.com/hejeong/django-todolist-api.svg?branch=master)](https://travis-ci.com/hejeong/django-todolist-api)
+![](https://github.com/hejeong/django-todolist-api/workflows/Run%20Tests/badge.svg)
 # django-todolist-api
 A sample todo list built using Django/Django REST Framework API and developed in TDD using pytest
 
