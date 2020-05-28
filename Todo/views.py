@@ -17,7 +17,7 @@ class TodoViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return Todo.objects.filter(owner=user)
+        return Todo.objects.filter(owner=user).order_by('-created')
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
