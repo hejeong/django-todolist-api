@@ -7,10 +7,6 @@ phases:
       - pip install -r requirements.txt
   build:
     commands:
-      - echo "Making migrations..."
-      - python manage.py makemigrations
-      - echo "Running migrations..."
-      - python manage.py migrate
       - echo "Running tests..."
       - pytest
   post_build:
