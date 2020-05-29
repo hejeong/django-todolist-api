@@ -13,6 +13,7 @@ router.register(r'todos', TodoViewSet)
 urlpatterns = [
     path('', include(router.urls)),
     path('users', views.register_user),
-    path('token', jwt_views.TokenObtainPairView.as_view(), name='token-obtain-pair'),
+    path('token', views.CustomTokenObtainPairView.as_view(), name='token-obtain-pair'),
     path('token/refresh', jwt_views.TokenRefreshView.as_view(), name='token-refresh'),
+    path('token/verify', views.check_user_token, name='token-verify'),
 ]
