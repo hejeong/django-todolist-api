@@ -26,7 +26,7 @@ SECRET_KEY = '4yhq()car+3c4upom6mk57v(t3_0-=wv-bzda_xdl-w5kcds@d'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['what-todo-api.us-east-1.elasticbeanstalk.com']
+ALLOWED_HOSTS = ['http://whattodo-env-1.eba-wey5cqsv.us-east-1.elasticbeanstalk.com/']
 
 
 # Application definition
