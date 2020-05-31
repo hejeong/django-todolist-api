@@ -9,6 +9,7 @@ phases:
   build:
     commands:
       - echo "Running tests..."
+      - pwd
       # run tests
       - pytest
   post_build:
