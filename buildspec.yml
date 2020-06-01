@@ -9,9 +9,9 @@ phases:
   build:
     commands:
       - echo "Running tests..."
-      - ls
+      - cd /opt/python/run && ls
       # run tests
-      - pytest
+      #- pytest
   post_build:
     commands:
       - echo Build completed on `date`
