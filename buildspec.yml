@@ -9,7 +9,7 @@ phases:
   build:
     commands:
       - echo "Running tests..."
-      - cd /opt/python/run && ls
+      - python manage.py migrate
       # run tests
       #- pytest
   post_build:
