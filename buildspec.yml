@@ -9,7 +9,8 @@ phases:
   build:
     commands:
       - echo "Running tests..."
-      - cd /usr/bin/python && ls
+      - cd /opt/
+      - ls
       # run tests
       #- pytest
   post_build:
