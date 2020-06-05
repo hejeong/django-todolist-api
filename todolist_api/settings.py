@@ -138,4 +138,4 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(minutes=2),
 }
 
-STATIC_ROOT = "/var/www/Whattodo-env-1.eba-wey5cqsv.us-east-1.elasticbeanstalk.com/static/"
+STATIC_ROOT = "/var/www/Whattodoapp-env.eba-jpp393pq.us-east-1.elasticbeanstalk.com/static/"
