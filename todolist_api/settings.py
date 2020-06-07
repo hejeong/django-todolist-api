@@ -123,6 +123,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
+STATIC_ROOT = os.path.join(BASE_DIR, "..", "www", "static")
 STATIC_URL = '/static/'
 
 REST_FRAMEWORK = {
@@ -138,4 +139,3 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(minutes=2),
 }
 
-STATIC_ROOT = "/var/www/Whattodoapp-env.eba-jpp393pq.us-east-1.elasticbeanstalk.com/static/"
