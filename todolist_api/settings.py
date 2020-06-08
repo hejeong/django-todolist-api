@@ -26,7 +26,7 @@ SECRET_KEY = '4yhq()car+3c4upom6mk57v(t3_0-=wv-bzda_xdl-w5kcds@d'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'Whattodoapp-env.eba-jpp393pq.us-east-1.elasticbeanstalk.com']
+ALLOWED_HOSTS = ['Whattodoapp-env.eba-jpp393pq.us-east-1.elasticbeanstalk.com']
 
 
 # Application definition
@@ -124,7 +124,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
-STATIC_URL = '/static'
+STATIC_URL = '/static/'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
